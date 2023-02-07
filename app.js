@@ -36,4 +36,4 @@ for (const file of commandFiles) {
 	}
 }
 
-client.login(process.env.TOKEN);
+client.login(process.env.TOKEN).then(() => console.log('done'));
