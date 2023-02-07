@@ -2,12 +2,17 @@
   "name": "pizzabviernes",
   "version": "1.0.0",
   "description": "Bot",
-  "main": "index.js",
+  "main": "app.js",
   "author": "Darkblue",
   "dependencies": {
+    "@discordjs/rest": "^1.5.0",
     "@discordjs/voice": "^0.13.0",
-    "discord.js": "^14.6.0",
-    "dotenv": "^16.0.3"
+    "discord-api-types": "^0.37.31",
+    "discord.js": "^14.7.1",
+    "dotenv": "^16.0.3",
+    "minecraft-server-util": "^5.3.2",
+    "node-fetch": "^3.3.0",
+    "pg": "^8.9.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -15,6 +20,6 @@
   "keywords": [],
   "license": "ISC",
   "devDependencies": {
-    "eslint": "^8.28.0"
+    "eslint": "^8.33.0"
   }
 }
