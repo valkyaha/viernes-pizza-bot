@@ -34,8 +34,9 @@ module.exports = {
 
 		if (interaction.isModalSubmit()) {
 			if (interaction.customId === 'minecraftModal') {
+
 				const minecraftUsername = interaction.fields.getTextInputValue('minecraftInput');
-				const minecraftHost = process.env.SERVER_HOST;
+				const minecraftHost = process.env.SERVE_IP_ADDRESS_MINECRAFT;
 				const minecraftPort = process.env.SERVER_HOST_PORT;
 
 				try {
@@ -85,3 +86,4 @@ module.exports = {
 		console.log(`${interaction.user.user} in #${interaction.channel.name} triggered an interaction.`);
 	},
 };
+
