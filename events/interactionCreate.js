@@ -37,7 +37,6 @@ module.exports = {
 
 				const minecraftUsername = interaction.fields.getTextInputValue('minecraftInput');
 				const minecraftHost = process.env.SERVE_IP_ADDRESS_MINECRAFT;
-				const minecraftPort = process.env.SERVER_HOST_PORT;
 
 				try {
 					if (interaction.member.roles.cache.some(role => role.name === 'YouTube Member') || interaction.member.roles.cache.some(role => role.name === 'Twitch Subscriber') || interaction.member.roles.cache.some(role => role.name === 'Server Booster')) {
@@ -47,7 +46,7 @@ module.exports = {
 						await minecraftRCONConnection(minecraftUsername);
 
 						await interaction.reply({
-							content: `Hola ${interaction.user.tag} aquí tienes la IP para acceder a Minecraft!\nIP: ${minecraftHost}\nPuerto: ${minecraftPort}`,
+							content: `Hola ${interaction.user.tag} aquí tienes la IP para acceder a Minecraft!\nIP: ${minecraftHost}\n`,
 							ephemeral: true,
 						});
 						return;
