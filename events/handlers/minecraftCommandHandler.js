@@ -23,7 +23,7 @@ module.exports = {
 					parseInt(process.env.SERVER_RCON_HOST_PORT),
 					connectOpt,
 				);
-				await client.login('Testing', loginOpt);
+				await client.login(process.env.MINECRAFT_RCON_PASSWORD, loginOpt);
 				await client.run('whitelist add '+ username);
 				client.close();
 			})();
