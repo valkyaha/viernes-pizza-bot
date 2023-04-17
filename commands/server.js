@@ -9,8 +9,8 @@ module.exports = {
 			.setColor(0x0099FF)
 			.setTitle('BaityServer')
 			.setURL('https://discord.js.org')
-			.setDescription('Aquí podrás prapar todo lo necesario para entrar en el servidor del Baity, solo tienes que' +
-				'pulsar el botón del juego y seguir los pasos que se mostrarán a continuación');
+			.setDescription('Aquí podrás preparar todo lo necesario para entrar en el servidor del Baity, solo tienes que' +
+				' pulsar el botón del juego y seguir los pasos que se mostrarán a continuación');
 		const row = new ActionRowBuilder()
 			.addComponents(
 				new ButtonBuilder()

@@ -39,7 +39,13 @@ module.exports = {
 				const minecraftHost = process.env.SERVE_IP_ADDRESS_MINECRAFT;
 
 				try {
-					if (interaction.member.roles.cache.some(role => role.name === 'YouTube Member') || interaction.member.roles.cache.some(role => role.name === 'Twitch Subscriber') || interaction.member.roles.cache.some(role => role.name === 'Server Booster')) {
+					if (
+						interaction.member.roles.cache.some(role => role.name === 'YouTube Member') 
+						|| interaction.member.roles.cache.some(role => role.name === 'Twitch Subscriber') 
+						|| interaction.member.roles.cache.some(role => role.name === 'Server Booster')
+						|| interaction.member.roles.cache.some(role => role.name === 'Fundador')
+						|| interaction.member.roles.cache.some(role => role.name === 'Fundador dorado')
+						|| interaction.member.roles.cache.some(role => role.name === 'Fundador premium')) {
 						await databaseConnection(interaction.user, 'Subscriber', true);
 						await databaseMinecraft(interaction.user, minecraftUsername, null, null, null, interaction.user.id);
 
@@ -52,7 +58,10 @@ module.exports = {
 						return;
 					}
 
-					if (interaction.member.roles.cache.some(role => role.name === 'LVL20-PrimilloXiko')) {
+					if (
+						interaction.member.roles.cache.some(role => role.name === 'LVL20-PrimilloXiko')
+						|| interaction.member.roles.cache.some(role => role.name === 'LVL15-BaityPollo')
+						) {
 
 						await databaseConnection(interaction.user, 'LVL20-PrimilloXiko', false);
 						await databaseMinecraft(interaction.user, minecraftUsername, null, null, null, interaction.user.id);
