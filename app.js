@@ -1,7 +1,9 @@
-require('dotenv').config();
 const { Client, GatewayIntentBits, Collection } = require('discord.js');
-const fs = require('node:fs');
-const path = require('node:path');
+const fs = require('fs');
+const path = require('path');
+const dotenv = require('dotenv');
+
+dotenv.config();
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
@@ -19,10 +21,10 @@ for (const file of eventFiles) {
 	}
 }
 
-client.commands = new Collection;
+client.commands = new Collection();
 
 const commandPath = path.join(__dirname, 'commands');
-const commandFiles = fs.readdirSync(commandPath).filter(files => files.endsWith('.js'));
+const commandFiles = fs.readdirSync(commandPath).filter(file => file.endsWith('.js'));
 
 for (const file of commandFiles) {
 	const filePath = path.join(commandPath, file);
@@ -32,8 +34,10 @@ for (const file of commandFiles) {
 		client.commands.set(command.data.name, command);
 	}
 	else {
-		console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
+		console.log(`[WARNING] El comando en ${filePath} está faltando una propiedad "data" o "execute" requerida.`);
 	}
 }
 
-client.login(process.env.TOKEN).then(() => console.log('done'));
+client.login(process.env.TOKEN)
+	.then(() => console.log('done'))
+	.catch(err => console.log(`[ERROR] Ocurrió un error al intentar iniciar sesión en Discord: ${err.message}`));

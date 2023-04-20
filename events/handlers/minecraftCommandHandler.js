@@ -17,16 +17,14 @@ module.exports = {
 		};
 
 		try {
-			await (async () => {
-				await client.connect(
-					process.env.SERVER_HOST,
-					parseInt(process.env.SERVER_RCON_HOST_PORT),
-					connectOpt,
-				);
-				await client.login(process.env.MINECRAFT_RCON_PASSWORD, loginOpt);
-				await client.run('whitelist add '+ username);
-				client.close();
-			})();
+			await client.connect(
+				process.env.SERVER_HOST,
+				parseInt(process.env.SERVER_RCON_HOST_PORT),
+				connectOpt,
+			);
+			await client.login(process.env.MINECRAFT_RCON_PASSWORD, loginOpt);
+			await client.run(`whitelist add ${username}`);
+			client.close();
 		} catch (err) {
 			console.log(err);
 		}

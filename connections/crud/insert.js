@@ -1,7 +1,33 @@
 module.exports = {
-	async insertUsers(pool, discordId, discordNickname, creationDate, actualLvl, subActive) {
-		await pool.query('INSERT INTO public.users ' + '(id_discord, discord_name, account_creation_date,actual_lvl,sub_active) ' + 'VALUES ($1, $2, $3, $4, $5)', [discordId, discordNickname, creationDate, actualLvl, subActive]);
-	}, async insertMinecraft(pool, minecraft, terraria, satisfactory, projectZomboid, id_discord) {
-		await pool.query('INSERT INTO public.nicknames ' + '(minecraft, terraria, satisfactory, project_zomboid, id_discord) ' + 'VALUES ($1, $2, $3, $4, $5)', [minecraft, terraria, satisfactory, projectZomboid, id_discord]);
+	async insertUsers(connection, discordId, discordNickname, creationDate, actualLvl, subActive) {
+	  await new Promise((resolve, reject) => {
+		connection.query(
+		  'INSERT INTO users (id_discord, discord_name, account_creation_date, actual_lvl, sub_active) VALUES (?, ?, ?, ?, ?)',
+		  [discordId, discordNickname, creationDate, actualLvl, subActive],
+		  (error, results) => {
+			if (error) {
+			  reject(error);
+			} else {
+			  resolve(results);
+			}
+		  }
+		);
+	  });
 	},
-};
+	async insertMinecraft(connection, minecraft, terraria, satisfactory, projectZomboid, id_discord) {
+	  await new Promise((resolve, reject) => {
+		connection.query(
+		  'INSERT INTO nicknames (minecraft, terraria, satisfactory, project_zomboid, id_discord) VALUES (?, ?, ?, ?, ?)',
+		  [minecraft, terraria, satisfactory, projectZomboid, id_discord],
+		  (error, results) => {
+			if (error) {
+			  reject(error);
+			} else {
+			  resolve(results);
+			}
+		  }
+		);
+	  });
+	},
+  };
+  
