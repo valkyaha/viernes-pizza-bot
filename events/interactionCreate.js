@@ -7,7 +7,7 @@ module.exports = {
 	name: Events.InteractionCreate, async execute(interaction) {
 		try {
 			if (interaction.isButton()) {
-				console.log(`${interaction.user.tag} in #${interaction.channel.name} clicked the offense button.`);
+				console.log(`${interaction.user.tag} in #${interaction.channel.name}`);
 
 				if (interaction.customId === 'minecraft') {
 					return interaction.showModal(await minecraftButtonHandler());
