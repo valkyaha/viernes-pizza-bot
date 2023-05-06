@@ -1,7 +1,7 @@
 const { Events } = require('discord.js');
 const { minecraftButtonHandler, zombieButtonHandler } = require('./handlers/buttonHandler');
 const { minecraftRCONConnection, projectZombieRCONConnection } = require('./handlers/RCONCommandHandler');
-const { databaseConnection, databaseMinecraft, databaseZombie } = require('../connections/database');
+const { databaseUsername, databaseNicknames, databaseZombie } = require('../connections/database');
 
 module.exports = {
 	name: Events.InteractionCreate, async execute(interaction) {
@@ -45,8 +45,8 @@ module.exports = {
 						if (interaction.member.roles.cache.some(role => {
 							return role.id === '1052635783816810526' || role.id === '956242154353721374' || role.id === '940767720981544982' || role.id === '940614159119294464' || role.id === '940613462701260802' || role.id === '940588435218006079';
 						})) {
-							await databaseConnection(interaction.user, 'Subscriber', true);
-							await databaseMinecraft(interaction.user, minecraftUsername, null, null, null, interaction.user.id);
+							await databaseUsername(interaction.user, 'Subscriber', true);
+							await databaseNicknames(interaction.user, minecraftUsername, null, null, null, interaction.user.id);
 
 							await minecraftRCONConnection(minecraftUsername);
 
@@ -58,8 +58,8 @@ module.exports = {
 						}
 
 						if (interaction.member.roles.cache.some(role => role.id === '1049677221977137203' || role.id === '1085537140416467075')) {
-							await databaseConnection(interaction.user, 'LVL20-PrimilloXiko', false);
-							await databaseMinecraft(interaction.user, minecraftUsername, null, null, null, interaction.user.id);
+							await databaseUsername(interaction.user, 'LVL20-PrimilloXiko', false);
+							await databaseNicknames(interaction.user, minecraftUsername, null, null, null, interaction.user.id);
 
 							await minecraftRCONConnection(minecraftUsername);
 
@@ -90,7 +90,7 @@ module.exports = {
 
 					try {
 						if (interaction.member.roles.cache.some(role => role.id === '1052635783816810526' || role.id === '956242154353721374' || role.id === '940767720981544982' || role.id === '940614159119294464' || role.id === '940613462701260802' || role.id === '940588435218006079')) {
-							await databaseConnection(interaction.user, 'Subscriber', true);
+							await databaseUsername(interaction.user, 'Subscriber', true);
 							await databaseZombie(interaction.user, null, null, null, zombieUsername, interaction.user.id);
 							await projectZombieRCONConnection(zombieUsername, zombiePassword);
 
@@ -102,13 +102,13 @@ module.exports = {
 						}
 
 						if (interaction.member.roles.cache.some(role => role.id === '1049677221977137203' || role.id === '1085537140416467075')) {
-							await databaseConnection(interaction.user, 'LVL20-PrimilloXiko', false);
-							await databaseZombie(interaction.user, zombieUsername, null, null, null, interaction.user.id);
+							await databaseUsername(interaction.user, 'LVL20-PrimilloXiko', false);
+							await databaseNicknames(interaction.user, zombieUsername, null, null, null, interaction.user.id);
 
 							await projectZombieRCONConnection(zombieUsername, zombiePassword);
 
 							await interaction.reply({
-								content: `Hola ${interaction.user.tag} aquí tienes la IP para acceder a Minecraft!\nIP: ${zombieHost}\nPuerto: ${zomboidPort}`,
+								content: `Hola ${interaction.user.tag} aquí tienes la IP para acceder a Minecraft!\nIP: ${zombieHost}\n`,
 								ephemeral: true,
 							});
 

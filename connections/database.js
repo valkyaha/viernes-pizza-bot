@@ -1,5 +1,5 @@
 const mysql = require('mysql');
-const { insertUsers, insertMinecraft, insertZombie } = require('./crud/insert');
+const { insertUsers, insertNickname, insertZombie } = require('./crud/insert');
 require('dotenv').config();
 
 const clientData = {
@@ -11,7 +11,7 @@ const clientData = {
 };
 
 module.exports = {
-	async databaseConnection(userData, lvl, isSubActive) {
+	async databaseUsername(userData, lvl, isSubActive) {
 		const connection = mysql.createConnection(clientData);
 		connection.connect();
 
@@ -20,22 +20,13 @@ module.exports = {
 		await insertUsers(connection, BigInt(userData.id), userData.tag, userData.createdAt, lvl, isSubActive);
 
 		connection.end();
-	}, async databaseMinecraft(userData, minecraft, terraria, satisfactory, projectZombie, idDiscord) {
+	}, async databaseNicknames(userData, minecraft, terraria, satisfactory, projectZombie, idDiscord) {
 		const connection = mysql.createConnection(clientData);
 		connection.connect();
 
 		connection.changeUser({ database: clientData.database });
 
-		await insertMinecraft(connection, minecraft, terraria, satisfactory, projectZombie, idDiscord);
-
-		connection.end();
-	}, async databaseZombie(userData, minecraft, terraria, satisfactory, projectZombie, idDiscord) {
-		const connection = mysql.createConnection(clientData);
-		connection.connect();
-
-		connection.changeUser({ database: clientData.database });
-
-		await insertZombie(connection, minecraft, terraria, satisfactory, projectZombie, idDiscord);
+		await insertNickname(connection, minecraft, terraria, satisfactory, projectZombie, idDiscord);
 
 		connection.end();
 	},
