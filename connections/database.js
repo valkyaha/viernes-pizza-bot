@@ -1,5 +1,5 @@
 const mysql = require('mysql');
-const { insertUsers, insertMinecraft } = require('./crud/insert');
+const { insertUsers, insertMinecraft, insertZomboid } = require('./crud/insert');
 require('dotenv').config();
 
 const clientData = {
@@ -30,5 +30,15 @@ module.exports = {
     await insertMinecraft(connection, minecraft, terraria, satisfactory, projectZomboid, idDiscord);
 
     connection.end();
+  },
+  async databaseZomboid(userData, minecraft, terraria, satisfactory, projectZomboid, idDiscord) {
+    const connection = mysql.createConnection(clientData);
+    connection.connect();
+
+    connection.changeUser({ database: clientData.database });
+
+    await insertZomboid(connection, minecraft, terraria, satisfactory, projectZomboid, idDiscord);
+
+    connection.end();2
   },
 };

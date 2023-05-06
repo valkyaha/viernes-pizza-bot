@@ -17,6 +17,11 @@ module.exports = {
 					.setCustomId('minecraft')
 					.setLabel('Minecraft')
 					.setStyle(ButtonStyle.Primary),
+
+				new ButtonBuilder()
+					.setCustomId('zomboid')
+					.setLabel('PZomboid')
+					.setStyle(ButtonStyle.Primary),
 			);
 
 		await interaction.reply({ embeds: [embed], components: [row] });

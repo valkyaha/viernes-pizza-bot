@@ -12,4 +12,24 @@ module.exports = {
 		modal.addComponents(firstActionRow);
 		return modal;
 	},
+	async zomboidButtonHandler() {
+
+		const modal = new ModalBuilder()
+			.setCustomId('zomboidModal')
+			.setTitle('Baity Zomboid');
+
+		const zomboidInput = new TextInputBuilder()
+			.setCustomId('zomboidUsernameInput')
+			.setLabel('Nick de Zomboid')
+			.setStyle(TextInputStyle.Short);
+
+		const zomboidInputPassword = new TextInputBuilder()
+			.setCustomId('zomboidPasswordInput')
+			.setLabel('Password de Zomboid')
+			.setStyle(TextInputStyle.Short);
+
+		modal.addComponents(new ActionRowBuilder().addComponents(zomboidInput));
+		modal.addComponents(new ActionRowBuilder().addComponents(zomboidInputPassword));
+		return modal;
+	},
 };

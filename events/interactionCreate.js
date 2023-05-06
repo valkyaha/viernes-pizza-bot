@@ -1,6 +1,6 @@
 const { Events } = require('discord.js');
-const { minecraftButtonHandler } = require('./handlers/buttonHandler');
-const { minecraftRCONConnection } = require('./handlers/minecraftCommandHandler');
+const { minecraftButtonHandler, zomboidButtonHandler } = require('./handlers/buttonHandler');
+const { minecraftRCONConnection, projectZombieRCONConnection } = require('./handlers/RCONCommandHandler');
 const { databaseConnection, databaseMinecraft } = require('../connections/database');
 
 module.exports = {
@@ -12,6 +12,10 @@ module.exports = {
 
 				if (interaction.customId === 'minecraft') {
 					return interaction.showModal(await minecraftButtonHandler());
+				}
+
+				if (interaction.customId === 'zomboid') {
+					return interaction.showModal(await zomboidButtonHandler());
 				}
 
 				return;
@@ -74,6 +78,66 @@ module.exports = {
 
 							await interaction.reply({
 								content: `Hola ${interaction.user.tag} aquí tienes la IP para acceder a Minecraft!\nIP: ${minecraftHost}\nPuerto: ${minecraftPort}`,
+								ephemeral: true,
+							});
+
+							return;
+						}
+
+						await interaction.reply({
+							content: `Hola ${interaction.user.tag} no tienes los requisitos necesarios para acceder al servidor\nSi crees que esto es un error abre un ticket a moderación y revisaremos tu caso`,
+							ephemeral: true,
+						});
+					} catch (err) {
+						await interaction.reply({
+							content: `Ya estás en la whitelist`,
+							ephemeral: true,
+						});
+					}
+				}
+
+
+
+				if (interaction.customId === 'zomboidModal') {
+					const zomboidUsername = interaction.fields.getTextInputValue('zomboidUsernameInput');
+					const zomboidPassword = interaction.fields.getTextInputValue('zomboidPasswordInput');
+					const zomboidHost = process.env.SERVER_HOST;
+
+					try {
+						if (
+							interaction.member.roles.cache.some(
+								role =>
+									role.id === '1052635783816810526' ||
+									role.id === '956242154353721374' ||
+									role.id === '940767720981544982' ||
+									role.id === '940614159119294464' ||
+									role.id === '940613462701260802' ||
+									role.id === '940588435218006079'
+							)
+						) {
+							//await databaseConnection(interaction.user, 'Subscriber', true);
+							//await databaseZomboid(interaction.user, null, null, null, zomboidUsername, interaction.user.id);
+							await projectZombieRCONConnection(zomboidUsername, zomboidPassword);
+
+							await interaction.reply({
+								content: `Hola ${interaction.user.tag} aquí tienes la IP para acceder a Project Zomboid!\nIP: ${zomboidHost}\n`,
+								ephemeral: true,
+							});
+							return;
+						}
+
+						if (
+							interaction.member.roles.cache.some(
+								role => role.id === '1049677221977137203' || role.id === '1085537140416467075'
+							)
+						) {
+							//await databaseConnection(interaction.user, 'LVL20-PrimilloXiko', false);
+							//await databaseZomboid(interaction.user, zomboidUsername, null, null, null, interaction.user.id);
+
+							await projectZombieRCONConnection(zomboidUsername, zomboidPassword);
+
+							await interaction.reply({
+								content: `Hola ${interaction.user.tag} aquí tienes la IP para acceder a Minecraft!\nIP: ${zomboidHost}\nPuerto: ${zomboidPort}`,
 								ephemeral: true,
 							});
 

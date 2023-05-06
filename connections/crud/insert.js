@@ -30,4 +30,19 @@ module.exports = {
 			);
 		});
 	},
+	async insertZomboid(connection, minecraft, terraria, satisfactory, projectZomboid, id_discord) {
+		await new Promise((resolve, reject) => {
+			connection.query(
+				'INSERT INTO nicknames (minecraft, terraria, satisfactory, project_zomboid, id_discord) VALUES (?, ?, ?, ?, ?)',
+				[minecraft, terraria, satisfactory, projectZomboid, id_discord],
+				(error, results) => {
+					if (error) {
+						reject(error);
+					} else {
+						resolve(results);
+					}
+				}
+			);
+		});
+	},
 };
