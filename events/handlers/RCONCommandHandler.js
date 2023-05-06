@@ -4,7 +4,7 @@ const { parseResponse } = require('@discordjs/rest');
 const net = require('net');
 const { RCON } = require('minecraft-server-util');
 require('dotenv').config();
-var Rcon = require('../../utils/RCON');
+const Rcon = require('../../utils/RCON');
 
 module.exports = {
 	async minecraftRCONConnection(username) {
@@ -37,7 +37,7 @@ module.exports = {
 
 	async projectZombieRCONConnection(username, password) {
 
-		var conn = new Rcon('localhost', 27015, process.env.PZOMBOID_RCON_PASSWORD);
+		let conn = new Rcon('localhost', 27015, process.env.PZOMBOID_RCON_PASSWORD);
 
 		conn.on('auth', function() {
 			console.log('Authenticated');
