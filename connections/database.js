@@ -1,34 +1,34 @@
 const mysql = require('mysql');
-const { insertUsers, insertMinecraft } = require('./crud/insert');
+const { insertUsers, insertNickname, insertZombie } = require('./crud/insert');
 require('dotenv').config();
 
 const clientData = {
-  user: process.env.DATABASE_USER,
-  host: process.env.DATABASE_HOST,
-  database: process.env.DATABASE_SCHEMA,
-  password: process.env.DATABASE_PASSWORD,
-  port: parseInt(process.env.DATABASE_PORT),
+	user: process.env.DATABASE_USER,
+	host: process.env.DATABASE_HOST,
+	database: process.env.DATABASE_SCHEMA,
+	password: process.env.DATABASE_PASSWORD,
+	port: parseInt(process.env.DATABASE_PORT),
 };
 
 module.exports = {
-  async databaseConnection(userData, lvl, isSubActive) {
-    const connection = mysql.createConnection(clientData);
-    connection.connect();
+	async databaseUsername(userData, lvl, isSubActive) {
+		const connection = mysql.createConnection(clientData);
 
-    connection.changeUser({ database: clientData.database });
+		connection.connect();
+		connection.changeUser({ database: clientData.database });
 
-    await insertUsers(connection, BigInt(userData.id), userData.tag, userData.createdAt, lvl, isSubActive);
+		await insertUsers(connection, BigInt(userData.id), userData.tag, userData.createdAt, lvl, isSubActive);
 
-    connection.end();
-  },
-  async databaseMinecraft(userData, minecraft, terraria, satisfactory, projectZomboid, idDiscord) {
-    const connection = mysql.createConnection(clientData);
-    connection.connect();
+		connection.end();
+	}, async databaseNicknames(userData, minecraft, terraria, satisfactory, projectZombie, idDiscord) {
 
-    connection.changeUser({ database: clientData.database });
+		const connection = mysql.createConnection(clientData);
 
-    await insertMinecraft(connection, minecraft, terraria, satisfactory, projectZomboid, idDiscord);
+		connection.connect();
+		connection.changeUser({ database: clientData.database });
 
-    connection.end();
-  },
+		await insertNickname(connection, minecraft, terraria, satisfactory, projectZombie, idDiscord);
+
+		connection.end();
+	},
 };
