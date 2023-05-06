@@ -4,29 +4,27 @@ const net = require('net');
 const dgram = require('dgram');
 Buffer = require('buffer').Buffer;
 
-let PacketType = {
+const PacketType = {
 	COMMAND: 0x02,
 	AUTH: 0x03,
 	RESPONSE_VALUE: 0x00,
-	RESPONSE_AUTH: 0x02
+	RESPONSE_AUTH: 0x02,
 };
 
-
-function Rcon(host, port, password, options) {
-	if (!(this instanceof Rcon)) return new Rcon(host, port, password, options);
-	options = options || {};
-
-	this.host = host;
-	this.port = port;
-	this.password = password;
-	this.rconId = options.id || 0x0012D4A6; // This is arbitrary in most cases
-	this.hasAuthed = false;
-	this.outstandingData = null;
-	this.tcp = options.tcp == null ? true : options.tcp;
-	this.challenge = options.challenge == null ? true : options.challenge;
-
-	events.EventEmitter.call(this);
+class Rcon extends events.EventEmitter {
+	constructor(host, port, password, options = {}) {
+		super();
+		this.host = host;
+		this.port = port;
+		this.password = password;
+		this.rconId = options.id ?? 0x0012D4A6; // Nullish coalescing operator instead of boolean OR
+		this.hasAuthed = false;
+		this.outstandingData = null;
+		this.tcp = options.tcp ?? true;
+		this.challenge = options.challenge ?? true;
+	}
 }
+
 
 util.inherits(Rcon, events.EventEmitter);
 
@@ -43,18 +41,19 @@ Rcon.prototype.send = function(data, cmd, id) {
 		sendBuf.writeInt32LE(cmd, 8);
 		sendBuf.write(data, 12);
 		sendBuf.writeInt16LE(0, length + 12);
-	} else {
+	}
+	else {
 		if (this.challenge && !this._challengeToken) {
 			this.emit('error', new Error('Not authenticated'));
 			return;
 		}
-		let str = "rcon ";
-		if (this._challengeToken) str += this._challengeToken + " ";
-		if (this.password) str += this.password + " ";
-		str += data + "\n";
+		let str = 'rcon ';
+		if (this._challengeToken) str += this._challengeToken + ' ';
+		if (this.password) str += this.password + ' ';
+		str += data + '\n';
 		sendBuf = Buffer.alloc(4 + Buffer.byteLength(str));
 		sendBuf.writeInt32LE(-1, 0);
-		sendBuf.write(str, 4)
+		sendBuf.write(str, 4);
 	}
 	this._sendSocket(sendBuf);
 };
@@ -62,7 +61,8 @@ Rcon.prototype.send = function(data, cmd, id) {
 Rcon.prototype._sendSocket = function(buf) {
 	if (this._tcpSocket) {
 		this._tcpSocket.write(buf.toString('binary'), 'binary');
-	} else if (this._udpSocket) {
+	}
+	else if (this._udpSocket) {
 		this._udpSocket.send(buf, 0, buf.length, this.port, this.host);
 	}
 };
@@ -72,16 +72,33 @@ Rcon.prototype.connect = function() {
 
 	if (this.tcp) {
 		this._tcpSocket = net.createConnection(this.port, this.host);
-		this._tcpSocket.on('data', function(data) { self._tcpSocketOnData(data) })
-			.on('connect', function() { self.socketOnConnect() })
-			.on('error', function(err) { self.emit('error', err) })
-			.on('end', function() { self.socketOnEnd() });
-	} else {
-		this._udpSocket = dgram.createSocket("udp4");
-		this._udpSocket.on('message', function(data) { self._udpSocketOnData(data) })
-			.on('listening', function() { self.socketOnConnect() })
-			.on('error', function(err) { self.emit('error', err) })
-			.on('close', function() { self.socketOnEnd() });
+		this._tcpSocket.on('data', function(data) {
+			self._tcpSocketOnData(data);
+		})
+			.on('connect', function() {
+				self.socketOnConnect();
+			})
+			.on('error', function(err) {
+				self.emit('error', err);
+			})
+			.on('end', function() {
+				self.socketOnEnd();
+			});
+	}
+	else {
+		this._udpSocket = dgram.createSocket('udp4');
+		this._udpSocket.on('message', function(data) {
+			self._udpSocketOnData(data);
+		})
+			.on('listening', function() {
+				self.socketOnConnect();
+			})
+			.on('error', function(err) {
+				self.emit('error', err);
+			})
+			.on('close', function() {
+				self.socketOnEnd();
+			});
 		this._udpSocket.bind(0);
 	}
 };
@@ -104,19 +121,21 @@ Rcon.prototype.setTimeout = function(timeout, callback) {
 Rcon.prototype._udpSocketOnData = function(data) {
 	let a = data.readUInt32LE(0);
 	if (a == 0xffffffff) {
-		let str = data.toString("utf-8", 4);
-		let tokens = str.split(" ");
-		if (tokens.length == 3 && tokens[0] == "challenge" && tokens[1] == "rcon") {
+		let str = data.toString('utf-8', 4);
+		let tokens = str.split(' ');
+		if (tokens.length == 3 && tokens[0] == 'challenge' && tokens[1] == 'rcon') {
 			this._challengeToken = tokens[2].substr(0, tokens[2].length - 1).trim();
 			this.hasAuthed = true;
 			this.emit('auth');
-		} else {
+		}
+		else {
 			this.emit('response', str.substr(1, str.length - 2));
 		}
-	} else {
-		this.emit('error', new Error("Received malformed packet"));
 	}
-}
+	else {
+		this.emit('error', new Error('Received malformed packet'));
+	}
+};
 
 Rcon.prototype._tcpSocketOnData = function(data) {
 	let str;
@@ -145,7 +164,8 @@ Rcon.prototype._tcpSocketOnData = function(data) {
 			if (!this.hasAuthed && type == PacketType.RESPONSE_AUTH) {
 				this.hasAuthed = true;
 				this.emit('auth');
-			} else if (type == PacketType.RESPONSE_VALUE) {
+			}
+			else if (type == PacketType.RESPONSE_VALUE) {
 				// Read just the body of the packet (truncate the last null byte)
 				// See https://developer.valvesoftware.com/wiki/Source_RCON_Protocol for details
 				str = data.toString('utf8', 12, 12 + bodyLen);
@@ -157,9 +177,11 @@ Rcon.prototype._tcpSocketOnData = function(data) {
 
 				this.emit('response', str);
 			}
-		} else if (id == -1) {
-			this.emit('error', new Error("Authentication failed"));
-		} else {
+		}
+		else if (id == -1) {
+			this.emit('error', new Error('Authentication failed'));
+		}
+		else {
 			// ping/pong likely
 			str = data.toString('utf8', 12, 12 + bodyLen);
 
@@ -184,13 +206,15 @@ Rcon.prototype.socketOnConnect = function() {
 
 	if (this.tcp) {
 		this.send(this.password, PacketType.AUTH);
-	} else if (this.challenge) {
-		let str = "challenge rcon\n";
+	}
+	else if (this.challenge) {
+		let str = 'challenge rcon\n';
 		sendBuf = Buffer.alloc(str.length + 4);
 		sendBuf.writeInt32LE(-1, 0);
 		sendBuf.write(str, 4);
 		this._sendSocket(sendBuf);
-	} else {
+	}
+	else {
 		sendBuf = Buffer.alloc(5);
 		sendBuf.writeInt32LE(-1, 0);
 		sendBuf.writeUInt8(0, 4);
