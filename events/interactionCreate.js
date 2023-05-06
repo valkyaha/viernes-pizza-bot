@@ -1,7 +1,9 @@
-const { Events } = require('discord.js');
+const { Events, roleMention } = require('discord.js');
 const { minecraftButtonHandler, zombieButtonHandler } = require('./handlers/buttonHandler');
 const { minecraftRCONConnection, projectZombieRCONConnection } = require('./handlers/RCONCommandHandler');
 const { databaseUsername, databaseNicknames, databaseZombie } = require('../connections/database');
+
+const allowedRoles = ['1052635783816810526', '956242154353721374', '940767720981544982', '940614159119294464', '940613462701260802', '940588435218006079'];
 
 module.exports = {
 	name: Events.InteractionCreate, async execute(interaction) {
@@ -42,9 +44,8 @@ module.exports = {
 					const minecraftHost = process.env.SERVE_IP_ADDRESS_MINECRAFT;
 
 					try {
-						if (interaction.member.roles.cache.some(role => {
-							return role.id === '1052635783816810526' || role.id === '956242154353721374' || role.id === '940767720981544982' || role.id === '940614159119294464' || role.id === '940613462701260802' || role.id === '940588435218006079';
-						})) {
+
+						if (allowedRoles.some(role => interaction.member.roles.cache.has(role))) {
 							await databaseUsername(interaction.user, 'Subscriber', true);
 							await databaseNicknames(interaction.user, minecraftUsername, null, null, null, interaction.user.id);
 
@@ -88,8 +89,9 @@ module.exports = {
 					const zombiePassword = interaction.fields.getTextInputValue('zombiePasswordInput');
 					const zombieHost = process.env.SERVER_HOST;
 
+
 					try {
-						if (interaction.member.roles.cache.some(role => role.id === '1052635783816810526' || role.id === '956242154353721374' || role.id === '940767720981544982' || role.id === '940614159119294464' || role.id === '940613462701260802' || role.id === '940588435218006079')) {
+						if (allowedRoles.some(role => interaction.member.roles.cache.has(role))) {
 							await databaseUsername(interaction.user, 'Subscriber', true);
 							await databaseZombie(interaction.user, null, null, null, zombieUsername, interaction.user.id);
 							await projectZombieRCONConnection(zombieUsername, zombiePassword);

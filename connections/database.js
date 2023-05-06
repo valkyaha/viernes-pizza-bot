@@ -13,17 +13,18 @@ const clientData = {
 module.exports = {
 	async databaseUsername(userData, lvl, isSubActive) {
 		const connection = mysql.createConnection(clientData);
-		connection.connect();
 
+		connection.connect();
 		connection.changeUser({ database: clientData.database });
 
 		await insertUsers(connection, BigInt(userData.id), userData.tag, userData.createdAt, lvl, isSubActive);
 
 		connection.end();
 	}, async databaseNicknames(userData, minecraft, terraria, satisfactory, projectZombie, idDiscord) {
-		const connection = mysql.createConnection(clientData);
-		connection.connect();
 
+		const connection = mysql.createConnection(clientData);
+
+		connection.connect();
 		connection.changeUser({ database: clientData.database });
 
 		await insertNickname(connection, minecraft, terraria, satisfactory, projectZombie, idDiscord);
