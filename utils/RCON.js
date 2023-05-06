@@ -59,48 +59,45 @@ class Rcon extends EventEmitter {
 	}
 
 	connect() {
-		const self = this;
-
 		if (this.tcp) {
 			this._tcpSocket = new Socket();
 			this._tcpSocket.connect(this.port, this.host);
-			this._tcpSocket.on('data', data => self._tcpSocketOnData(data))
-				.on('connect', () => self.socketOnConnect())
-				.on('error', err => self.emit('error', err))
-				.on('end', () => self.socketOnEnd());
+			this._tcpSocket.on('data', data => this._tcpSocketOnData(data))
+				.on('connect', () => this.socketOnConnect())
+				.on('error', err => this.emit('error', err))
+				.on('end', () => this.socketOnEnd());
 		}
 		else {
 			this._udpSocket = dgram.createSocket('udp4');
-			this._udpSocket.on('message', data => self._udpSocketOnData(data))
-				.on('listening', () => self.socketOnConnect())
-				.on('error', err => self.emit('error', err))
-				.on('close', () => self.socketOnEnd());
+			this._udpSocket.on('message', data => this._udpSocketOnData(data))
+				.on('listening', () => this.socketOnConnect())
+				.on('error', err => this.emit('error', err))
+				.on('close', () => this.socketOnEnd());
 			this._udpSocket.bind(0);
 		}
 	}
+
+	disconnect() {
+		if (this._tcpSocket) this._tcpSocket.end();
+		if (this._udpSocket) this._udpSocket.close();
+	}
+
+	setTimeout(timeout, callback) {
+		if (!this._tcpSocket) return;
+
+		this._tcpSocket.setTimeout(timeout, function() {
+			this._tcpSocket.end();
+			if (callback) callback();
+		});
+	}
 }
-
-Rcon.prototype.disconnect = function() {
-	if (this._tcpSocket) this._tcpSocket.end();
-	if (this._udpSocket) this._udpSocket.close();
-};
-
-Rcon.prototype.setTimeout = function(timeout, callback) {
-	if (!this._tcpSocket) return;
-
-	let self = this;
-	this._tcpSocket.setTimeout(timeout, function() {
-		self._tcpSocket.end();
-		if (callback) callback();
-	});
-};
 
 Rcon.prototype._udpSocketOnData = function(data) {
 	let a = data.readUInt32LE(0);
-	if (a == 0xffffffff) {
+	if (a === 0xffffffff) {
 		let str = data.toString('utf-8', 4);
 		let tokens = str.split(' ');
-		if (tokens.length == 3 && tokens[0] == 'challenge' && tokens[1] == 'rcon') {
+		if (tokens.length === 3 && tokens[0] === 'challenge' && tokens[1] === 'rcon') {
 			this._challengeToken = tokens[2].substr(0, tokens[2].length - 1).trim();
 			this.hasAuthed = true;
 			this.emit('auth');
@@ -147,7 +144,6 @@ Rcon.prototype._tcpSocketOnData = function(data) {
 				str = data.toString('utf8', 12, 12 + bodyLen);
 
 				if (str.endsWith('\n')) {
-					// Emit the response without the newline.
 					str = str.slice(0, -1);
 				}
 
