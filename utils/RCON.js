@@ -26,15 +26,10 @@ class Rcon extends events.EventEmitter {
 }
 
 
-util.inherits(Rcon, events.EventEmitter);
-
-Rcon.prototype.send = function(data, cmd, id) {
+Rcon.prototype.send = function(data, cmd = PacketType.COMMAND, id = this.rconId) {
 	let sendBuf;
 	if (this.tcp) {
-		cmd = cmd || PacketType.COMMAND;
-		id = id || this.rconId;
-
-		let length = Buffer.byteLength(data);
+		const length = Buffer.byteLength(data);
 		sendBuf = Buffer.alloc(length + 14);
 		sendBuf.writeInt32LE(length + 10, 0);
 		sendBuf.writeInt32LE(id, 4);
@@ -48,8 +43,12 @@ Rcon.prototype.send = function(data, cmd, id) {
 			return;
 		}
 		let str = 'rcon ';
-		if (this._challengeToken) str += this._challengeToken + ' ';
-		if (this.password) str += this.password + ' ';
+		if (this._challengeToken) {
+			str += this._challengeToken + ' ';
+		}
+		if (this.password) {
+			str += this.password + ' ';
+		}
 		str += data + '\n';
 		sendBuf = Buffer.alloc(4 + Buffer.byteLength(str));
 		sendBuf.writeInt32LE(-1, 0);
@@ -57,6 +56,7 @@ Rcon.prototype.send = function(data, cmd, id) {
 	}
 	this._sendSocket(sendBuf);
 };
+
 
 Rcon.prototype._sendSocket = function(buf) {
 	if (this._tcpSocket) {
