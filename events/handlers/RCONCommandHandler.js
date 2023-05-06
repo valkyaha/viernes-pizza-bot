@@ -4,7 +4,7 @@ const { parseResponse } = require('@discordjs/rest');
 const net = require('net');
 const { RCON } = require('minecraft-server-util');
 require('dotenv').config();
-const Rcon = require('../../utils/RCON');
+const Rcon = require('../../utils/remoteConsole/RCON');
 
 module.exports = {
 	async minecraftRCONConnection(username) {
@@ -22,11 +22,7 @@ module.exports = {
 		};
 
 		try {
-			await client.connect(
-				process.env.SERVER_HOST,
-				parseInt(process.env.SERVER_RCON_HOST_PORT),
-				connectOpt,
-			);
+			await client.connect(process.env.SERVER_HOST, parseInt(process.env.SERVER_RCON_HOST_PORT), connectOpt);
 			await client.login(process.env.MINECRAFT_RCON_PASSWORD, loginOpt);
 			await client.run(`whitelist add ${username}`);
 			client.close();
@@ -40,8 +36,7 @@ module.exports = {
 		let conn = new Rcon('localhost', 27015, process.env.PZOMBOID_RCON_PASSWORD);
 
 		conn.on('auth', function() {
-			console.log('Authenticated');
-			console.log('Sending command: help');
+			console.log('Sending command:');
 			conn.send(`adduser ${username} ${password}`);
 		}).on('response', function(str) {
 			console.log('Response: ' + str);

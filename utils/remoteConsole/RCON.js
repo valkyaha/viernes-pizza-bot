@@ -98,12 +98,12 @@ Rcon.prototype._udpSocketOnData = function(data) {
 		let str = data.toString('utf-8', 4);
 		let tokens = str.split(' ');
 		if (tokens.length === 3 && tokens[0] === 'challenge' && tokens[1] === 'rcon') {
-			this._challengeToken = tokens[2].substr(0, tokens[2].length - 1).trim();
+			this._challengeToken = tokens[2].substring(0, tokens[2].length - 1).trim();
 			this.hasAuthed = true;
 			this.emit('auth');
 		}
 		else {
-			this.emit('response', str.substr(1, str.length - 2));
+			this.emit('response', str.substring(1, str.length - 1));
 		}
 	}
 	else {
@@ -112,60 +112,75 @@ Rcon.prototype._udpSocketOnData = function(data) {
 };
 
 Rcon.prototype._tcpSocketOnData = function(data) {
-	let str;
-
 	if (this.outstandingData != null) {
 		data = Buffer.concat([this.outstandingData, data], this.outstandingData.length + data.length);
 		this.outstandingData = null;
 	}
 
-	while (data.length >= 12) {
-		const len = data.readInt32LE(0);
-		if (!len) return;
+	let packet = this._parsePacket(data);
 
-		const packetLen = len + 4;
-		if (data.length < packetLen) break;
-
-		const bodyLen = len - 10;
-		if (bodyLen < 0) {
-			data = data.slice(packetLen);
-			break;
+	while (packet != null) {
+		if (packet.id === this.rconId) {
+			this._handleRconPacket(packet);
 		}
-
-		const id = data.readInt32LE(4);
-		const type = data.readInt32LE(8);
-
-		if (id === this.rconId) {
-			if (!this.hasAuthed && type === PacketType.RESPONSE_AUTH) {
-				this.hasAuthed = true;
-				this.emit('auth');
-			}
-			else if (type === PacketType.RESPONSE_VALUE) {
-				str = data.toString('utf8', 12, 12 + bodyLen);
-
-				if (str.endsWith('\n')) {
-					str = str.slice(0, -1);
-				}
-
-				this.emit('response', str);
-			}
-		}
-		else if (id === -1) {
+		else if (packet.id === -1) {
 			this.emit('error', new Error('Authentication failed'));
 		}
 		else {
-			str = data.toString('utf8', 12, 12 + bodyLen);
-
-			if (str.endsWith('\n')) {
-				str = str.slice(0, -1);
-			}
-
-			this.emit('server', str);
+			this.emit('server', packet.body);
 		}
 
-		data = data.slice(packetLen);
+		packet = this._parsePacket(packet.remainingData);
 	}
-	this.outstandingData = data;
+
+	this.outstandingData = packet != null ? packet.remainingData : data;
+};
+
+Rcon.prototype._parsePacket = function(data) {
+	if (data.length < 12) {
+		return null;
+	}
+
+	const len = data.readInt32LE(0);
+
+	if (!len) {
+		return null;
+	}
+
+	const packetLen = len + 4;
+
+	if (data.length < packetLen) {
+		return null;
+	}
+
+	const id = data.readInt32LE(4);
+	const type = data.readInt32LE(8);
+	const bodyLen = len - 10;
+
+	if (bodyLen < 0) {
+		return {
+			remainingData: data.slice(packetLen),
+		};
+	}
+
+	const body = data.toString('utf8', 12, 12 + bodyLen).replace(/\n$/, '');
+
+	return {
+		id,
+		type,
+		body,
+		remainingData: data.slice(packetLen),
+	};
+};
+
+Rcon.prototype._handleRconPacket = function(packet) {
+	if (!this.hasAuthed && packet.type === PacketType.RESPONSE_AUTH) {
+		this.hasAuthed = true;
+		this.emit('auth');
+	}
+	else if (packet.type === PacketType.RESPONSE_VALUE) {
+		this.emit('response', packet.body);
+	}
 };
 
 
