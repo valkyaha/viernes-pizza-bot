@@ -1,10 +1,6 @@
 const util = require('minecraft-server-util');
-const { connect } = require('mysql/lib/Connection');
-const { parseResponse } = require('@discordjs/rest');
-const net = require('net');
-const { RCON } = require('minecraft-server-util');
 require('dotenv').config();
-const Rcon = require('../../utils/remoteConsole/RCON');
+const remoteConsole = require('../../utils/remoteConsole/RCON');
 
 module.exports = {
 	async minecraftRCONConnection(username) {
@@ -33,7 +29,7 @@ module.exports = {
 
 	async projectZombieRCONConnection(username, password) {
 
-		let conn = new Rcon('localhost', 27015, process.env.PZOMBOID_RCON_PASSWORD);
+		let conn = new remoteConsole('localhost', 27015, process.env.PZOMBOID_RCON_PASSWORD);
 
 		conn.on('auth', function() {
 			console.log('Sending command:');

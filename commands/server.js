@@ -19,7 +19,7 @@ module.exports = {
 					.setStyle(ButtonStyle.Primary),
 
 				new ButtonBuilder()
-					.setCustomId('zomboid')
+					.setCustomId('zombie')
 					.setLabel('PZomboid')
 					.setStyle(ButtonStyle.Primary),
 			);

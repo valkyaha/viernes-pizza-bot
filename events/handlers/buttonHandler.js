@@ -11,25 +11,24 @@ module.exports = {
 		const firstActionRow = new ActionRowBuilder().addComponents(minecraftInput);
 		modal.addComponents(firstActionRow);
 		return modal;
-	},
-	async zomboidButtonHandler() {
+	}, async zombieButtonHandler() {
 
 		const modal = new ModalBuilder()
-			.setCustomId('zomboidModal')
+			.setCustomId('zombieModal')
 			.setTitle('Baity Zomboid');
 
-		const zomboidInput = new TextInputBuilder()
-			.setCustomId('zomboidUsernameInput')
+		const zombieInput = new TextInputBuilder()
+			.setCustomId('zombieUsernameInput')
 			.setLabel('Nick de Zomboid')
 			.setStyle(TextInputStyle.Short);
 
-		const zomboidInputPassword = new TextInputBuilder()
-			.setCustomId('zomboidPasswordInput')
+		const zombieInputPassword = new TextInputBuilder()
+			.setCustomId('zombiePasswordInput')
 			.setLabel('Password de Zomboid')
 			.setStyle(TextInputStyle.Short);
 
-		modal.addComponents(new ActionRowBuilder().addComponents(zomboidInput));
-		modal.addComponents(new ActionRowBuilder().addComponents(zomboidInputPassword));
+		modal.addComponents(new ActionRowBuilder().addComponents(zombieInput));
+		modal.addComponents(new ActionRowBuilder().addComponents(zombieInputPassword));
 		return modal;
 	},
 };

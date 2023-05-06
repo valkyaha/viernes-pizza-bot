@@ -6,7 +6,7 @@ const PacketType = {
 	COMMAND: 0x02, AUTH: 0x03, RESPONSE_VALUE: 0x00, RESPONSE_AUTH: 0x02,
 };
 
-class Rcon extends EventEmitter {
+class RemoteConsole extends EventEmitter {
 	constructor(host, port, password, options = {}) {
 		super();
 		this.host = host;
@@ -92,7 +92,7 @@ class Rcon extends EventEmitter {
 	}
 }
 
-Rcon.prototype._udpSocketOnData = function(data) {
+RemoteConsole.prototype._udpSocketOnData = function(data) {
 	let a = data.readUInt32LE(0);
 	if (a === 0xffffffff) {
 		let str = data.toString('utf-8', 4);
@@ -111,7 +111,7 @@ Rcon.prototype._udpSocketOnData = function(data) {
 	}
 };
 
-Rcon.prototype._tcpSocketOnData = function(data) {
+RemoteConsole.prototype._tcpSocketOnData = function(data) {
 	if (this.outstandingData != null) {
 		data = Buffer.concat([this.outstandingData, data], this.outstandingData.length + data.length);
 		this.outstandingData = null;
@@ -121,7 +121,7 @@ Rcon.prototype._tcpSocketOnData = function(data) {
 
 	while (packet != null) {
 		if (packet.id === this.rconId) {
-			this._handleRconPacket(packet);
+			this._handleRemoteConsolePacket(packet);
 		}
 		else if (packet.id === -1) {
 			this.emit('error', new Error('Authentication failed'));
@@ -136,7 +136,7 @@ Rcon.prototype._tcpSocketOnData = function(data) {
 	this.outstandingData = packet != null ? packet.remainingData : data;
 };
 
-Rcon.prototype._parsePacket = function(data) {
+RemoteConsole.prototype._parsePacket = function(data) {
 	if (data.length < 12) {
 		return null;
 	}
@@ -173,7 +173,7 @@ Rcon.prototype._parsePacket = function(data) {
 	};
 };
 
-Rcon.prototype._handleRconPacket = function(packet) {
+RemoteConsole.prototype._handleRemoteConsolePacket = function(packet) {
 	if (!this.hasAuthed && packet.type === PacketType.RESPONSE_AUTH) {
 		this.hasAuthed = true;
 		this.emit('auth');
@@ -184,7 +184,7 @@ Rcon.prototype._handleRconPacket = function(packet) {
 };
 
 
-Rcon.prototype.socketOnConnect = function() {
+RemoteConsole.prototype.socketOnConnect = function() {
 	let sendBuf;
 	this.emit('connect');
 
@@ -209,9 +209,9 @@ Rcon.prototype.socketOnConnect = function() {
 	}
 };
 
-Rcon.prototype.socketOnEnd = function() {
+RemoteConsole.prototype.socketOnEnd = function() {
 	this.emit('end');
 	this.hasAuthed = false;
 };
 
-module.exports = Rcon;
+module.exports = RemoteConsole;

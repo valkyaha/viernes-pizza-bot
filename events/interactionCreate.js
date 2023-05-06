@@ -1,11 +1,10 @@
 const { Events } = require('discord.js');
-const { minecraftButtonHandler, zomboidButtonHandler } = require('./handlers/buttonHandler');
+const { minecraftButtonHandler, zombieButtonHandler } = require('./handlers/buttonHandler');
 const { minecraftRCONConnection, projectZombieRCONConnection } = require('./handlers/RCONCommandHandler');
-const { databaseConnection, databaseMinecraft } = require('../connections/database');
+const { databaseConnection, databaseMinecraft, databaseZombie } = require('../connections/database');
 
 module.exports = {
-	name: Events.InteractionCreate,
-	async execute(interaction) {
+	name: Events.InteractionCreate, async execute(interaction) {
 		try {
 			if (interaction.isButton()) {
 				console.log(`${interaction.user.tag} in #${interaction.channel.name} clicked the offense button.`);
@@ -14,8 +13,8 @@ module.exports = {
 					return interaction.showModal(await minecraftButtonHandler());
 				}
 
-				if (interaction.customId === 'zomboid') {
-					return interaction.showModal(await zomboidButtonHandler());
+				if (interaction.customId === 'zombie') {
+					return interaction.showModal(await zombieButtonHandler());
 				}
 
 				return;
@@ -43,17 +42,9 @@ module.exports = {
 					const minecraftHost = process.env.SERVE_IP_ADDRESS_MINECRAFT;
 
 					try {
-						if (
-							interaction.member.roles.cache.some(
-								role =>
-									role.id === '1052635783816810526' ||
-									role.id === '956242154353721374' ||
-									role.id === '940767720981544982' ||
-									role.id === '940614159119294464' ||
-									role.id === '940613462701260802' ||
-									role.id === '940588435218006079'
-							)
-						) {
+						if (interaction.member.roles.cache.some(role => {
+							return role.id === '1052635783816810526' || role.id === '956242154353721374' || role.id === '940767720981544982' || role.id === '940614159119294464' || role.id === '940613462701260802' || role.id === '940588435218006079';
+						})) {
 							await databaseConnection(interaction.user, 'Subscriber', true);
 							await databaseMinecraft(interaction.user, minecraftUsername, null, null, null, interaction.user.id);
 
@@ -66,18 +57,14 @@ module.exports = {
 							return;
 						}
 
-						if (
-							interaction.member.roles.cache.some(
-								role => role.id === '1049677221977137203' || role.id === '1085537140416467075'
-							)
-						) {
+						if (interaction.member.roles.cache.some(role => role.id === '1049677221977137203' || role.id === '1085537140416467075')) {
 							await databaseConnection(interaction.user, 'LVL20-PrimilloXiko', false);
 							await databaseMinecraft(interaction.user, minecraftUsername, null, null, null, interaction.user.id);
 
 							await minecraftRCONConnection(minecraftUsername);
 
 							await interaction.reply({
-								content: `Hola ${interaction.user.tag} aquí tienes la IP para acceder a Minecraft!\nIP: ${minecraftHost}\nPuerto: ${minecraftPort}`,
+								content: `Hola ${interaction.user.tag} aquí tienes la IP para acceder a Minecraft!\nIP: ${minecraftHost}\n`,
 								ephemeral: true,
 							});
 
@@ -90,54 +77,38 @@ module.exports = {
 						});
 					} catch (err) {
 						await interaction.reply({
-							content: `Ya estás en la whitelist`,
-							ephemeral: true,
+							content: `Ya estás en la whitelist`, ephemeral: true,
 						});
 					}
 				}
 
 
-
-				if (interaction.customId === 'zomboidModal') {
-					const zomboidUsername = interaction.fields.getTextInputValue('zomboidUsernameInput');
-					const zomboidPassword = interaction.fields.getTextInputValue('zomboidPasswordInput');
-					const zomboidHost = process.env.SERVER_HOST;
+				if (interaction.customId === 'zombieModal') {
+					const zombieUsername = interaction.fields.getTextInputValue('zombieUsernameInput');
+					const zombiePassword = interaction.fields.getTextInputValue('zombiePasswordInput');
+					const zombieHost = process.env.SERVER_HOST;
 
 					try {
-						if (
-							interaction.member.roles.cache.some(
-								role =>
-									role.id === '1052635783816810526' ||
-									role.id === '956242154353721374' ||
-									role.id === '940767720981544982' ||
-									role.id === '940614159119294464' ||
-									role.id === '940613462701260802' ||
-									role.id === '940588435218006079'
-							)
-						) {
-							//await databaseConnection(interaction.user, 'Subscriber', true);
-							//await databaseZomboid(interaction.user, null, null, null, zomboidUsername, interaction.user.id);
-							await projectZombieRCONConnection(zomboidUsername, zomboidPassword);
+						if (interaction.member.roles.cache.some(role => role.id === '1052635783816810526' || role.id === '956242154353721374' || role.id === '940767720981544982' || role.id === '940614159119294464' || role.id === '940613462701260802' || role.id === '940588435218006079')) {
+							await databaseConnection(interaction.user, 'Subscriber', true);
+							await databaseZombie(interaction.user, null, null, null, zombieUsername, interaction.user.id);
+							await projectZombieRCONConnection(zombieUsername, zombiePassword);
 
 							await interaction.reply({
-								content: `Hola ${interaction.user.tag} aquí tienes la IP para acceder a Project Zomboid!\nIP: ${zomboidHost}\n`,
+								content: `Hola ${interaction.user.tag} aquí tienes la IP para acceder a Project Zomboid!\nIP: ${zombieHost}\n`,
 								ephemeral: true,
 							});
 							return;
 						}
 
-						if (
-							interaction.member.roles.cache.some(
-								role => role.id === '1049677221977137203' || role.id === '1085537140416467075'
-							)
-						) {
-							//await databaseConnection(interaction.user, 'LVL20-PrimilloXiko', false);
-							//await databaseZomboid(interaction.user, zomboidUsername, null, null, null, interaction.user.id);
+						if (interaction.member.roles.cache.some(role => role.id === '1049677221977137203' || role.id === '1085537140416467075')) {
+							await databaseConnection(interaction.user, 'LVL20-PrimilloXiko', false);
+							await databaseZombie(interaction.user, zombieUsername, null, null, null, interaction.user.id);
 
-							await projectZombieRCONConnection(zomboidUsername, zomboidPassword);
+							await projectZombieRCONConnection(zombieUsername, zombiePassword);
 
 							await interaction.reply({
-								content: `Hola ${interaction.user.tag} aquí tienes la IP para acceder a Minecraft!\nIP: ${zomboidHost}\nPuerto: ${zomboidPort}`,
+								content: `Hola ${interaction.user.tag} aquí tienes la IP para acceder a Minecraft!\nIP: ${zombieHost}\nPuerto: ${zomboidPort}`,
 								ephemeral: true,
 							});
 
@@ -150,8 +121,7 @@ module.exports = {
 						});
 					} catch (err) {
 						await interaction.reply({
-							content: `Ya estás en la whitelist`,
-							ephemeral: true,
+							content: `Ya estás en la whitelist`, ephemeral: true,
 						});
 					}
 				}
