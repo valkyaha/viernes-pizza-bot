@@ -1,9 +1,8 @@
-let util = require('util')
-	, events = require('events')
-	, net = require('net')
-	, dgram = require('dgram')
-	, Buffer = require('buffer').Buffer;
-
+const util = require('util');
+const events = require('events');
+const net = require('net');
+const dgram = require('dgram');
+Buffer = require('buffer').Buffer;
 
 let PacketType = {
 	COMMAND: 0x02,
