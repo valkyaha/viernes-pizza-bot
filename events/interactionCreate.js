@@ -1,7 +1,7 @@
 const { Events, roleMention } = require('discord.js');
 const { minecraftButtonHandler, zombieButtonHandler } = require('./handlers/buttonHandler');
 const { minecraftRCONConnection, projectZombieRCONConnection } = require('./handlers/RCONCommandHandler');
-const { databaseUsername, databaseNicknames, databaseZombie } = require('../connections/database');
+const { databaseUsername, databaseNicknames} = require('../connections/database');
 
 const allowedRoles = ['1052635783816810526', '956242154353721374', '940767720981544982', '940614159119294464', '940613462701260802', '940588435218006079'];
 
@@ -93,7 +93,7 @@ module.exports = {
 					try {
 						if (allowedRoles.some(role => interaction.member.roles.cache.has(role))) {
 							await databaseUsername(interaction.user, 'Subscriber', true);
-							await databaseZombie(interaction.user, null, null, null, zombieUsername, interaction.user.id);
+							await databaseNicknames(interaction.user, null, null, null, zombieUsername, interaction.user.id);
 							await projectZombieRCONConnection(zombieUsername, zombiePassword);
 
 							await interaction.reply({
