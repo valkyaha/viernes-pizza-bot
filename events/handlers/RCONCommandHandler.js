@@ -29,7 +29,7 @@ module.exports = {
 
 	async projectZombieRCONConnection(username, password) {
 
-		let conn = new remoteConsole('localhost', 27015, process.env.PZOMBOID_RCON_PASSWORD);
+		let conn = new remoteConsole(process.env.PZOMBOID_RCON_HOST, 27015, process.env.PZOMBOID_RCON_PASSWORD);
 
 		conn.on('auth', function() {
 			console.log('Sending command:');
